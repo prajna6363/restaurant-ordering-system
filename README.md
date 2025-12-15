@@ -8,7 +8,7 @@ A MongoDB-based restaurant ordering system built using:
 - HTML, CSS, JavaScript
 
 ## Features
-- View restaurant menu
+- View restaurant menu 
 - Place food orders
 - Live order total calculation
 - Order status tracking
