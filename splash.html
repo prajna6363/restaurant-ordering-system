@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #ff7a18, #ffb347);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", sans-serif;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .splash {
+      text-align: center;
+      color: white;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .logo {
+      font-size: 70px;
+      animation: bounce 2s infinite;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin: 15px 0 10px;
+      letter-spacing: 2px;
+    }
+
+    p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+  </style>
+</head>
+<body onclick="goNext()">
+
+  <div class="splash">
+    <div class="logo">🍽️</div>
+    <h1>Restaurant Ordering System</h1>
+    <p>MongoDB Based Web Application</p>
+    
+  </div>
+
+  <script>
+    function goNext() {
+      window.location.href = "index.html";
+    }
+
+    // Auto redirect after 10 seconds
+    setTimeout(goNext, 10000);
+  </script>
+
+</body>
+</html>

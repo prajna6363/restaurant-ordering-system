@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Restaurant Ordering System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>🍽️ Restaurant Menu</h1>
+
+  <!-- MENU TABLE -->
+  <table id="menuTable">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Price (₹)</th>
+        <th>Qty</th>
+      </tr>
+    </thead>
+    <tbody id="menuBody"></tbody>
+  </table>
+
+  <!-- LIVE TOTAL -->
+  <h3>🧾 Current Total: ₹<span id="liveTotal">0</span></h3>
+
+  <!-- ORDER FORM -->
+  <h2>Place Your Order</h2>
+  <input type="text" id="customerName" placeholder="Your Name" required>
+
+  <button onclick="placeOrder()">Place Order</button>
+
+  <!-- ORDER SUMMARY -->
+  <div id="orderSummary" style="display:none;">
+    <h3>Order Summary</h3>
+    <p><strong>Order ID:</strong> <span id="orderId"></span></p>
+    <ul id="summaryItems"></ul>
+    <p><strong>Total:</strong> ₹<span id="totalAmount">0</span></p>
+    <p><strong>Status:</strong> <span id="orderStatus">pending</span></p>
+
+    <!-- Download Receipt Button -->
+    <button onclick="downloadReceipt()">🧾 Download Receipt</button>
+  </div>
+</div>
+
+<script>
+let menu = [];
+let currentOrderId = null;
+
+// Load Menu
+async function loadMenu() {
+  const res = await fetch("http://localhost:3000/menu");
+  menu = await res.json();
+
+  const tbody = document.getElementById("menuBody");
+  tbody.innerHTML = "";
+
+  menu.forEach(item => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.name}</td>
+      <td>₹${item.price}</td>
+      <td>
+        <input type="number" min="0" value="0"
+          data-name="${item.name}"
+          data-price="${item.price}"
+          onchange="calculateTotal()">
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+loadMenu();
+
+// LIVE TOTAL CALCULATION
+function calculateTotal() {
+  let total = 0;
+  const inputs = document.querySelectorAll("input[type='number']");
+
+  inputs.forEach(i => {
+    const qty = parseInt(i.value);
+    if (qty > 0) total += qty * parseInt(i.dataset.price);
+  });
+
+  document.getElementById("liveTotal").innerText = total;
+}
+
+// Place Order
+async function placeOrder() {
+  const customerName = document.getElementById("customerName").value;
+  if (!customerName) { alert("Enter your name"); return; }
+
+  const inputs = document.querySelectorAll("input[type='number']");
+  let items = [];
+  let total = 0;
+
+  inputs.forEach(i => {
+    const qty = parseInt(i.value);
+    if (qty > 0) {
+      items.push({ name: i.dataset.name, quantity: qty });
+      total += qty * parseInt(i.dataset.price);
+    }
+  });
+
+  if (items.length === 0) { alert("Select at least one item"); return; }
+
+  const res = await fetch("http://localhost:3000/order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customerName, items, totalAmount: total })
+  });
+
+  const data = await res.json();
+  currentOrderId = data.orderId;
+
+  document.getElementById("orderId").innerText = data.orderId;
+  document.getElementById("totalAmount").innerText = data.totalAmount;
+  document.getElementById("orderStatus").innerText = data.status;
+
+  const summaryList = document.getElementById("summaryItems");
+  summaryList.innerHTML = "";
+  data.items.forEach(i => {
+    const li = document.createElement("li");
+    li.innerText = `${i.name} x ${i.quantity}`;
+    summaryList.appendChild(li);
+  });
+
+  document.getElementById("orderSummary").style.display = "block";
+}
+
+// Poll Order Status every 5 seconds
+setInterval(async () => {
+  if (!currentOrderId) return;
+  const res = await fetch(`http://localhost:3000/order/${currentOrderId}`);
+  const order = await res.json();
+  document.getElementById("orderStatus").innerText = order.status;
+}, 5000);
+
+// Download Receipt
+function downloadReceipt() {
+  if (!currentOrderId) return alert("No order to download.");
+
+  const customer = document.getElementById("customerName").value;
+  const orderId = document.getElementById("orderId").innerText;
+  const total = document.getElementById("totalAmount").innerText;
+  const status = document.getElementById("orderStatus").innerText;
+
+  const items = Array.from(document.getElementById("summaryItems").children)
+    .map(li => li.innerText)
+    .join("\n");
+
+  const receiptText = `
+----- RECEIPT -----
+Order ID: ${orderId}
+Customer: ${customer}
+
+Items:
+${items}
+
+Total: ₹${total}
+Status: ${status}
+-------------------
+`;
+
+  const blob = new Blob([receiptText], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `receipt_${orderId}.txt`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>

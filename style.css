@@ -1,0 +1,210 @@
+/* --------------------
+   Global Styles
+-------------------- */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+  min-height: 100vh;
+}
+
+/* --------------------
+   Container
+-------------------- */
+.container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 40px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* --------------------
+   Headings
+-------------------- */
+h1 {
+  text-align: center;
+  color: #e65100;
+  margin-bottom: 20px;
+}
+
+h2 {
+  color: #ff6f00;
+  border-left: 6px solid #ff6f00;
+  padding-left: 10px;
+  margin-top: 30px;
+}
+
+/* --------------------
+   Inputs & Buttons
+-------------------- */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #ff6f00;
+}
+
+button {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* --------------------
+   Tables
+-------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+thead {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+}
+
+th, td {
+  padding: 14px;
+  text-align: center;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #fff3e0;
+}
+
+tbody tr:hover {
+  background-color: #ffe0b2;
+}
+
+/* --------------------
+   Menu Cards (Customer)
+-------------------- */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.menu-card {
+  background: #fff8f0;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  transition: 0.3s;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+}
+
+.menu-card h3 {
+  color: #e65100;
+  margin-bottom: 8px;
+}
+
+.menu-card p {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+.menu-card input {
+  width: 70px;
+  margin-top: 10px;
+}
+
+/* --------------------
+   Status Badge
+-------------------- */
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status.pending {
+  background: #ffe082;
+  color: #6d4c41;
+}
+
+.status.preparing {
+  background: #ffcc80;
+  color: #e65100;
+}
+
+.status.ready {
+  background: #a5d6a7;
+  color: #1b5e20;
+}
+
+.status.delivered {
+  background: #81c784;
+  color: #1b5e20;
+}
+
+/* --------------------
+   Order Summary Box
+-------------------- */
+.summary-box {
+  margin-top: 25px;
+  background: #fff3e0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* --------------------
+   Responsive
+-------------------- */
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  th {
+    display: none;
+  }
+
+  td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: 45%;
+    text-align: left;
+    font-weight: bold;
+    color: #e65100;
+  }
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <h1>👨‍🍳 Admin Panel</h1>
+
+  <!-- LOGIN -->
+  <div id="loginBox">
+    <h2>Admin Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="loginError" style="color:red;"></p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" style="display:none;">
+    <h2>📦 Orders</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total (₹)</th>
+          <th>Status</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+let ADMIN_TOKEN = "";
+
+// LOGIN
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("http://localhost:3000/admin/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  if (!res.ok) {
+    document.getElementById("loginError").innerText = "Invalid login";
+    return;
+  }
+
+  const data = await res.json();
+  ADMIN_TOKEN = data.token;
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+
+  loadOrders();
+}
+
+// LOAD ORDERS
+async function loadOrders() {
+  const res = await fetch("http://localhost:3000/admin/orders", {
+    headers: {
+      "Authorization": ADMIN_TOKEN
+    }
+  });
+
+  const orders = await res.json();
+  const tbody = document.getElementById("ordersBody");
+  tbody.innerHTML = "";
+
+  orders.forEach(order => {
+    const tr = document.createElement("tr");
+
+    let itemsHTML = "";
+    order.items.forEach(i => {
+      itemsHTML += `${i.name} x ${i.quantity}<br>`;
+    });
+
+    tr.innerHTML = `
+      <td>${order._id}</td>
+      <td>${order.customerName}</td>
+      <td>${itemsHTML}</td>
+      <td>${order.totalAmount}</td>
+      <td>
+        <select id="status-${order._id}">
+          <option ${order.status==="pending"?"selected":""}>pending</option>
+          <option ${order.status==="preparing"?"selected":""}>preparing</option>
+          <option ${order.status==="ready"?"selected":""}>ready</option>
+          <option ${order.status==="delivered"?"selected":""}>delivered</option>
+        </select>
+      </td>
+      <td>
+        <button onclick="updateStatus('${order._id}')">Update</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+// UPDATE STATUS
+async function updateStatus(orderId) {
+  const status = document.getElementById(`status-${orderId}`).value;
+
+  await fetch(`http://localhost:3000/admin/order/${orderId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": ADMIN_TOKEN
+    },
+    body: JSON.stringify({ status })
+  });
+
+  alert("Status updated");
+}
+</script>
+
+</body>
+</html>
